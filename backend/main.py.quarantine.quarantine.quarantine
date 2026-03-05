@@ -1,0 +1,71 @@
+# =========================================================
+#  OmniSuite Beta Backend – Clean Rebuild (2026‑02‑04)
+# =========================================================
+from fastapi import FastAPI
+from datetime import datetime
+
+# --- Licensing ---
+from backend.tiers import get_tier, new_license, DEFAULT_TIERS
+from backend.auth import require_tier   # ← ADD THIS LINE
+
+# --- Security Layers ---
+from backend.security.auto_repair import monitor_services
+from backend.security.watchdog import system_watchdog
+from backend.security.malware_guard import guard_loop
+import threading
+from backend.scheduler import enterprise_scheduler
+
+# =========================================================
+#  FastAPI Application
+# =========================================================
+app = FastAPI(title="OmniSuite Beta")
+
+
+# ----------  BASIC ROUTES ----------
+@app.get("/")
+def root():
+    return {"message": "🚀 OmniSuite Beta backend is running!"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
+
+
+# ----------  LICENSING ROUTES ----------
+@app.get("/tier/{username}")
+def check_user_tier(username: str):
+    """Return user's active tier and its features."""
+    tier = get_tier(username)
+    features = DEFAULT_TIERS.get(tier, {})
+    return {"username": username, "tier": tier, "features": features}
+
+@app.api_route("/license/create", methods=["GET", "POST"])
+def create_license(username: str, tier: str = "Basic", days: int = 30):
+    """Create or extend a user's license key manually."""
+    record = new_license(username, tier, days)
+    return {"license": record, "message": f"{tier} license activated for {username}"}
+
+# ----------  PRO‑ONLY TEST ENDPOINT ----------
+@app.get("/pro-auto-order/{username}")
+@require_tier("Pro")
+async def pro_auto_order(username: str):
+	return {"user": username, "message": "✅ Auto-order activated for Pro tier or higher."}
+
+# ----------  ENTERPRISE‑ONLY TEST ENDPOINT ----------
+@app.get("/enterprise-hourly-sync/{username}")
+@require_tier("Enterprise")
+async def enterprise_hourly_sync(username: str):
+    """Simulated Hourly Sync reserved for Enterprise tier."""
+    return {
+        "user": username,
+        "message": "🕒 Hourly Sync and ML Optimizer activated for Enterprise tier."
+    }
+
+# ----------  SECURITY THREADS ----------
+@app.on_event("startup")
+def launch_security_layers():
+    """Automatically starts background safety modules."""
+    threading.Thread(target=monitor_services, daemon=True).start()
+    threading.Thread(target=system_watchdog, daemon=True).start()
+    threading.Thread(target=guard_loop, daemon=True).start()
+    threading.Thread(target=enterprise_scheduler, daemon=True).start()

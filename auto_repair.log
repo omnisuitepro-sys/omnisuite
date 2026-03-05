@@ -1,0 +1,133 @@
+2026-02-03 21:19:42,340 | ERROR | Auto\u2011repair error: Command 'tasklist' returned non-zero exit status 3221225786.
+2026-02-03 22:41:14,147 | WARNING | \u26a0\ufe0f CPU anomaly detected: 8.8%  avg:5.3%
+2026-02-03 22:51:08,232 | WARNING | \u26a0\ufe0f CPU anomaly detected: 26.0%  avg:6.2%
+2026-02-03 22:51:19,234 | WARNING | \u26a0\ufe0f CPU anomaly detected: 29.6%  avg:7.0%
+2026-02-04 05:08:39,338 | WARNING | \u26a0\ufe0f CPU anomaly detected: 21.7%  avg:9.2%
+2026-02-04 18:15:56,406 | WARNING | \u26a0\ufe0f CPU anomaly detected: 9.9%  avg:5.6%
+2026-02-04 18:16:51,410 | WARNING | \u26a0\ufe0f CPU anomaly detected: 17.3%  avg:6.1%
+2026-02-04 18:26:15,408 | WARNING | \u26a0\ufe0f CPU anomaly detected: 23.6%  avg:6.8%
+2026-02-04 18:41:08,544 | WARNING | \u26a0\ufe0f CPU anomaly detected: 18.0%  avg:6.3%
+2026-02-04 23:19:47,785 | WARNING | \u26a0\ufe0f CPU anomaly detected: 32.4%  avg:6.1%
+2026-02-04 23:31:53,880 | WARNING | \u26a0\ufe0f CPU anomaly detected: 12.2%  avg:5.3%
+2026-02-04 23:32:15,882 | WARNING | \u26a0\ufe0f CPU anomaly detected: 10.9%  avg:5.6%
+2026-02-04 23:32:48,887 | WARNING | \u26a0\ufe0f CPU anomaly detected: 19.5%  avg:6.2%
+2026-02-08 03:52:40,908 | WARNING | \u26a0\ufe0f CPU anomaly detected: 11.7%  avg:5.6%
+2026-02-08 03:53:35,913 | WARNING | \u26a0\ufe0f CPU anomaly detected: 11.7%  avg:5.7%
+2026-02-08 03:54:02,374 | WARNING | \u26a0\ufe0f CPU anomaly detected: 18.1%  avg:6.3%
+2026-02-08 03:58:48,410 | WARNING | \u26a0\ufe0f CPU anomaly detected: 34.7%  avg:7.4%
+2026-02-09 16:06:49,863 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py
+2026-02-09 16:06:49,868 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc
+2026-02-09 16:17:56,074 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py
+2026-02-09 16:17:56,077 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine
+2026-02-09 16:17:56,081 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc
+2026-02-09 16:17:56,092 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine
+2026-02-09 16:24:44,485 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\auth.py
+2026-02-09 16:24:44,490 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\auth.cpython-314.pyc
+2026-02-09 16:31:06,179 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py
+2026-02-09 16:31:06,181 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine
+2026-02-09 16:31:06,184 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine.quarantine
+2026-02-09 16:31:06,188 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc
+2026-02-09 16:31:06,198 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine
+2026-02-09 16:31:06,201 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine.quarantine
+2026-02-09 16:36:59,198 | WARNING | \u26a0\ufe0f CPU anomaly detected: 26.6%  avg:8.7%
+2026-02-09 21:48:52,587 | WARNING | \u26a0\ufe0f CPU anomaly detected: 15.9%  avg:5.8%
+2026-02-09 21:50:37,650 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py
+2026-02-09 21:50:37,652 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine
+2026-02-09 21:50:37,655 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine.quarantine
+2026-02-09 21:50:37,657 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine.quarantine.quarantine
+2026-02-09 21:50:37,666 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc
+2026-02-09 21:50:37,677 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine
+2026-02-09 21:50:37,679 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine.quarantine
+2026-02-09 21:50:37,682 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine.quarantine.quarantine
+2026-02-09 21:59:55,633 | WARNING | \u26a0\ufe0f CPU anomaly detected: 8.8%  avg:6.1%
+2026-02-09 22:03:24,656 | WARNING | \u26a0\ufe0f CPU anomaly detected: 16.7%  avg:7.4%
+2026-02-09 22:04:08,675 | WARNING | \u26a0\ufe0f CPU anomaly detected: 79.8%  avg:10.7%
+2026-02-09 22:04:19,702 | WARNING | \u26a0\ufe0f CPU anomaly detected: 72.9%  avg:12.9%
+2026-02-09 23:17:54,803 | WARNING | \u26a0\ufe0f CPU anomaly detected: 16.3%  avg:6.0%
+2026-02-21 01:56:26,601 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 01:56:26,642 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py
+2026-02-21 01:56:26,645 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine
+2026-02-21 01:56:26,646 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine.quarantine
+2026-02-21 01:56:26,648 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine.quarantine.quarantine
+2026-02-21 01:56:26,650 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\main.py.quarantine.quarantine.quarantine.quarantine
+2026-02-21 01:56:26,708 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc
+2026-02-21 01:56:26,717 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine
+2026-02-21 01:56:26,719 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine.quarantine
+2026-02-21 01:56:26,721 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine.quarantine.quarantine
+2026-02-21 01:56:26,723 | CRITICAL | \U0001f480\u202fFile integrity changed: backend\__pycache__\main.cpython-314.pyc.quarantine.quarantine.quarantine.quarantine
+2026-02-21 01:56:29,602 | INFO | \u2705 Sync complete for Alice at 2026-02-21T06:56:29.602467
+2026-02-21 01:58:34,473 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 01:58:37,474 | INFO | \u2705 Sync complete for Alice at 2026-02-21T06:58:37.474611
+2026-02-21 02:11:25,551 | WARNING | \u26a0\ufe0f CPU anomaly detected: 10.3%  avg:7.4%
+2026-02-21 02:14:10,605 | WARNING | \u26a0\ufe0f CPU anomaly detected: 14.0%  avg:7.3%
+2026-02-21 02:22:03,664 | WARNING | \u26a0\ufe0f CPU anomaly detected: 8.2%  avg:6.5%
+2026-02-21 02:22:25,668 | WARNING | \u26a0\ufe0f CPU anomaly detected: 9.3%  avg:6.7%
+2026-02-21 02:22:36,670 | WARNING | \u26a0\ufe0f CPU anomaly detected: 12.6%  avg:6.9%
+2026-02-21 02:24:26,681 | WARNING | \u26a0\ufe0f CPU anomaly detected: 14.8%  avg:7.8%
+2026-02-21 02:37:05,764 | WARNING | \u26a0\ufe0f CPU anomaly detected: 13.5%  avg:7.3%
+2026-02-21 02:42:57,804 | WARNING | \u26a0\ufe0f CPU anomaly detected: 17.3%  avg:7.3%
+2026-02-21 02:54:52,875 | WARNING | \u26a0\ufe0f CPU anomaly detected: 7.0%  avg:6.2%
+2026-02-21 02:56:20,886 | WARNING | \u26a0\ufe0f CPU anomaly detected: 7.4%  avg:6.3%
+2026-02-21 02:58:21,919 | WARNING | \u26a0\ufe0f CPU anomaly detected: 11.2%  avg:6.8%
+2026-02-21 02:58:34,474 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 02:58:37,475 | INFO | \u2705 Sync complete for Alice at 2026-02-21T07:58:37.475477
+2026-02-21 02:59:27,926 | WARNING | \u26a0\ufe0f CPU anomaly detected: 14.5%  avg:7.2%
+2026-02-21 03:18:10,060 | WARNING | \u26a0\ufe0f CPU anomaly detected: 7.0%  avg:6.2%
+2026-02-21 03:21:50,087 | WARNING | \u26a0\ufe0f CPU anomaly detected: 8.5%  avg:6.7%
+2026-02-21 03:23:40,100 | WARNING | \u26a0\ufe0f CPU anomaly detected: 12.9%  avg:7.0%
+2026-02-21 03:26:58,125 | WARNING | \u26a0\ufe0f CPU anomaly detected: 14.9%  avg:7.5%
+2026-02-21 03:36:30,200 | WARNING | \u26a0\ufe0f CPU anomaly detected: 12.1%  avg:6.5%
+2026-02-21 03:37:25,207 | WARNING | \u26a0\ufe0f CPU anomaly detected: 11.7%  avg:6.7%
+2026-02-21 03:42:55,243 | WARNING | \u26a0\ufe0f CPU anomaly detected: 18.8%  avg:7.2%
+2026-02-21 03:43:17,245 | WARNING | \u26a0\ufe0f CPU anomaly detected: 18.2%  avg:7.6%
+2026-02-21 12:22:39,707 | WARNING | \u26a0\ufe0f CPU anomaly detected: 15.2%  avg:6.5%
+2026-02-21 12:28:42,754 | WARNING | \u26a0\ufe0f CPU anomaly detected: 8.1%  avg:5.9%
+2026-02-21 12:29:41,891 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 12:29:44,892 | INFO | \u2705 Sync complete for Alice at 2026-02-21T17:29:44.892045
+2026-02-21 13:08:30,068 | WARNING | \u26a0\ufe0f CPU anomaly detected: 7.0%  avg:6.1%
+2026-02-21 13:17:40,141 | WARNING | \u26a0\ufe0f CPU anomaly detected: 5.2%  avg:6.1%
+2026-02-21 13:22:59,181 | WARNING | \u26a0\ufe0f CPU anomaly detected: 7.3%  avg:6.1%
+2026-02-21 13:28:40,225 | WARNING | \u26a0\ufe0f CPU anomaly detected: 8.0%  avg:6.2%
+2026-02-21 13:29:35,232 | WARNING | \u26a0\ufe0f CPU anomaly detected: 11.2%  avg:6.4%
+2026-02-21 13:29:41,893 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 13:29:44,893 | INFO | \u2705 Sync complete for Alice at 2026-02-21T18:29:44.893540
+2026-02-21 13:38:12,296 | WARNING | \u26a0\ufe0f CPU anomaly detected: 8.2%  avg:6.2%
+2026-02-21 17:42:21,592 | WARNING | \u26a0\ufe0f CPU anomaly detected: 10.5%  avg:6.1%
+2026-02-21 17:45:06,614 | WARNING | \u26a0\ufe0f CPU anomaly detected: 13.1%  avg:6.3%
+2026-02-21 17:53:21,673 | WARNING | \u26a0\ufe0f CPU anomaly detected: 14.0%  avg:6.4%
+2026-02-21 18:00:52,726 | WARNING | \u26a0\ufe0f CPU anomaly detected: 4.5%  avg:6.1%
+2026-02-21 18:06:44,767 | WARNING | \u26a0\ufe0f CPU anomaly detected: 7.2%  avg:6.2%
+2026-02-21 18:06:55,769 | WARNING | \u26a0\ufe0f CPU anomaly detected: 11.1%  avg:6.3%
+2026-02-21 18:07:17,772 | WARNING | \u26a0\ufe0f CPU anomaly detected: 16.9%  avg:6.7%
+2026-02-21 18:30:00,201 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 18:30:03,201 | INFO | \u2705 Sync complete for Alice at 2026-02-21T23:30:03.201893
+2026-02-21 18:35:20,979 | WARNING | \u26a0\ufe0f CPU anomaly detected: 5.5%  avg:7.0%
+2026-02-21 18:40:51,015 | WARNING | \u26a0\ufe0f CPU anomaly detected: 10.4%  avg:7.3%
+2026-02-21 18:41:02,016 | WARNING | \u26a0\ufe0f CPU anomaly detected: 11.2%  avg:7.5%
+2026-02-21 18:43:25,114 | WARNING | \u26a0\ufe0f CPU anomaly detected: 24.5%  avg:8.1%
+2026-02-21 18:51:18,173 | WARNING | \u26a0\ufe0f CPU anomaly detected: 12.9%  avg:7.7%
+2026-02-21 18:52:57,182 | WARNING | \u26a0\ufe0f CPU anomaly detected: 21.6%  avg:8.4%
+2026-02-21 19:03:02,252 | WARNING | \u26a0\ufe0f CPU anomaly detected: 15.3%  avg:7.3%
+2026-02-21 19:03:46,257 | WARNING | \u26a0\ufe0f CPU anomaly detected: 16.2%  avg:7.6%
+2026-02-21 19:10:33,303 | WARNING | \u26a0\ufe0f CPU anomaly detected: 17.0%  avg:8.2%
+2026-02-21 19:30:00,202 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 19:30:03,203 | INFO | \u2705 Sync complete for Alice at 2026-02-22T00:30:03.203183
+2026-02-21 19:40:48,531 | WARNING | \u26a0\ufe0f CPU anomaly detected: 7.0%  avg:6.2%
+2026-02-21 19:42:52,433 | WARNING | \u26a0\ufe0f CPU anomaly detected: 32.2%  avg:7.0%
+2026-02-21 19:54:58,565 | WARNING | \u26a0\ufe0f CPU anomaly detected: 20.2%  avg:9.2%
+2026-02-21 20:09:38,664 | WARNING | \u26a0\ufe0f CPU anomaly detected: 20.4%  avg:8.7%
+2026-02-21 20:15:30,707 | WARNING | \u26a0\ufe0f CPU anomaly detected: 19.1%  avg:9.1%
+2026-02-21 20:22:28,758 | WARNING | \u26a0\ufe0f CPU anomaly detected: 20.2%  avg:8.8%
+2026-02-21 20:29:15,811 | WARNING | \u26a0\ufe0f CPU anomaly detected: 21.1%  avg:8.8%
+2026-02-21 20:31:20,101 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 20:31:23,102 | INFO | \u2705 Sync complete for Alice at 2026-02-22T01:31:23.102564
+2026-02-21 20:39:20,882 | WARNING | \u26a0\ufe0f CPU anomaly detected: 17.2%  avg:10.0%
+2026-02-21 20:43:00,913 | WARNING | \u26a0\ufe0f CPU anomaly detected: 28.0%  avg:10.1%
+2026-02-21 20:53:27,979 | WARNING | \u26a0\ufe0f CPU anomaly detected: 17.7%  avg:8.8%
+2026-02-21 20:54:11,985 | WARNING | \u26a0\ufe0f CPU anomaly detected: 26.9%  avg:9.5%
+2026-02-21 21:00:59,036 | WARNING | \u26a0\ufe0f CPU anomaly detected: 17.6%  avg:8.3%
+2026-02-21 21:18:24,198 | WARNING | \u26a0\ufe0f CPU anomaly detected: 21.4%  avg:9.7%
+2026-02-21 21:31:20,104 | INFO | \u2699\ufe0f Hourly Sync Start — user: Alice
+2026-02-21 21:31:23,105 | INFO | \u2705 Sync complete for Alice at 2026-02-22T02:31:23.105842
+2026-02-21 21:35:05,334 | WARNING | \u26a0\ufe0f CPU anomaly detected: 19.4%  avg:10.2%
+2026-02-21 21:38:34,361 | WARNING | \u26a0\ufe0f CPU anomaly detected: 28.6%  avg:10.3%
