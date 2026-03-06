@@ -1,24 +1,26 @@
-# backend/db_session.py
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Detect DB_URL (Render or other host)
-db_url = os.getenv("DB_URL")
+# Detect database URL or fallback
+DB_URL = os.getenv("DB_URL")
 
-if not db_url:
-    # Default to a writable temp directory inside the container
-    os.makedirs("/tmp/data", exist_ok=True)
-    db_path = os.path.join("/tmp/data", "omni_core.db")
-    db_url = f"sqlite:///{db_path}"
+if not DB_URL:
+    # Render runtime (Linux) path check
+    if os.path.exists("/opt/render"):
+        os.makedirs("/tmp/sqlite_data", exist_ok=True)
+        DB_URL = "sqlite:////tmp/sqlite_data/omni_core.db"
+    else:
+        # Local Windows path for development
+        DB_URL = "sqlite:///C:/OmniSuite/backend/omni_core.db"
 
 engine = create_engine(
-    db_url,
+    DB_URL,
     echo=False,
-    connect_args={"check_same_thread": False} if db_url.startswith("sqlite") else {},
+    connect_args={"check_same_thread": False} if DB_URL.startswith("sqlite") else {},
 )
 
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 def get_session():
     db = SessionLocal()
