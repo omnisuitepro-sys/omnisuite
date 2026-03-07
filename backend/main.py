@@ -1,6 +1,9 @@
 # ------------------------------------------------------------
 # main.py — OmniSuite Backend Entry Point
 # ------------------------------------------------------------
+import os
+print("🚀 CURRENT DB_URL =", os.getenv("DB_URL"))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
