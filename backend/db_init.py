@@ -1,79 +1,63 @@
 import os
-from datetime import datetime
-from sqlalchemy import (
-    create_engine, Column, Integer, String, DateTime, Text, Float,
-    Enum, ForeignKey, Boolean
-)
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Text, ForeignKey, func
+from sqlalchemy.orm import relationship, declarative_base
+from backend.db_session import engine
 
-# -------------------------------------------------------------
-# 1. DATABASE SELECTION
-# -------------------------------------------------------------
-# SQLite for local development - easiest setup
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "omni_core.db")
-DATABASE_URL = f"sqlite:///{DB_PATH}"
+# ---------- Base Class ----------
+Base = declarative_base()
 
-# For future VPS/PostgreSQL:
-# DATABASE_URL = "postgresql+psycopg2://username:password@localhost/omnirecall"
-
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(bind=engine)
-from backend.core.db_base import Base
-
-# -------------------------------------------------------------
-# 2. TABLE: Licenses
-# -------------------------------------------------------------
+# ---------- Example Tables ----------
 class License(Base):
     __tablename__ = "licenses"
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, index=True, unique=True)
-    tier = Column(String, default="Free")
-    expiry = Column(DateTime, default=datetime.utcnow)
-    created_at = Column(DateTime, default=datetime.utcnow)
 
-# -------------------------------------------------------------
-# 3. TABLE: Pending Trades
-# -------------------------------------------------------------
+    id = Column(Integer, primary_key=True, index=True)
+    license_key = Column(String(256), unique=True, nullable=False)
+    user_email = Column(String(255))
+    plan_type = Column(String(100))
+    active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+
+
 class PendingTrade(Base):
     __tablename__ = "pending_trades"
-    id = Column(Integer, primary_key=True, index=True)
-    trade_id = Column(String, unique=True, index=True)
-    symbol = Column(String)
-    side = Column(String)
-    reason = Column(Text)
-    status = Column(String, default="pending_approval")
-    created_at = Column(DateTime, default=datetime.utcnow)
 
-# -------------------------------------------------------------
-# 4. TABLE: System Logs
-# -------------------------------------------------------------
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer)
+    symbol = Column(String(20))
+    trade_type = Column(String(10))  # BUY / SELL
+    quantity = Column(Float)
+    price = Column(Float)
+    status = Column(String(50), default="pending")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class SystemLog(Base):
     __tablename__ = "system_logs"
+
     id = Column(Integer, primary_key=True, index=True)
-    level = Column(String)
+    event_type = Column(String(100))
     message = Column(Text)
-    timestamp = Column(DateTime, default=datetime.utcnow)
-    source = Column(String, default="core")
+    level = Column(String(50), default="INFO")  # INFO / WARNING / ERROR
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-# -------------------------------------------------------------
-# 5. INITIALIZATION METHOD
-# -------------------------------------------------------------
-def init_database():
-    print("🧩  Initializing Omni Core database...")
-    Base.metadata.create_all(bind=engine)
-    print(f"✅  Database ready: {DB_PATH}")
 
+# ---------- Initialize Database ----------
+def init_db():
+    """
+    Called once on app startup. Creates all tables on the active engine.
+    Works for both Render PostgreSQL (via DB_URL) and local SQLite fallback.
+    """
+    try:
+        print("🔹 Initializing database schema...")
+        Base.metadata.create_all(bind=engine)
+        print("✅ Database tables ready.")
+    except Exception as e:
+        print("❌ Database initialization failed:", e)
+        raise
+
+
+# ---------- Entry Point ----------
 if __name__ == "__main__":
-    init_database()
-
-from sqlalchemy import create_engine
-from backend.finance.models import Base
-
-engine = create_engine(
-    "sqlite:///C:/OmniSuite/backend/omni_core.db", echo=True, future=True
-)
-
-Base.metadata.create_all(bind=engine)
-print("✅  Database ready:", os.path.abspath("backend/omni_core.db"))
+    print("🔸 Running direct database initialization")
+    init_db()
