@@ -1,35 +1,65 @@
-# ------------------------------------------------------------
-# main.py — OmniSuite Backend Entry Point
-# ------------------------------------------------------------
-import os
-print("🚀 CURRENT DB_URL =", os.getenv("DB_URL"))
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from backend.finance.omni_alpha_routes import app as alpha_finance_app
 
-# Initialize the FastAPI app FIRST (avoids NameError)
-app = FastAPI(title="OmniSuite Backend", version="1.0.0")
-
-# ------------------------------------------------------------
-# Global Middleware (CORS, etc.)
-# ------------------------------------------------------------
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+# =========================================================
+# ✅ FASTAPI APPLICATION INIT
+# =========================================================
+app = FastAPI(
+    title="OmniSuite API",
+    description="Core backend API for OmniMirror + OmniSuite dashboard.",
+    version="1.0.0",
 )
 
-# ------------------------------------------------------------
-# Mount Finance Module (/alpha)
-# ------------------------------------------------------------
-from backend.finance.omni_alpha_routes import app as alpha_finance_app
+# =========================================================
+# ✅ CORS CONFIGURATION (Updated)
+# =========================================================
+origins = [
+    "http://localhost:3000",                  # Local development dashboard
+    "https://dashboard.getomnirecall.com",    # Production dashboard
+    "https://api.getomnirecall.com",          # Render/Backend API
+]
+
+# Optional: wildcard subdomain support for future staging (e.g. beta, dev)
+# from starlette.middleware.cors import CORSMiddleware
+# origins.append("https://*.getomnirecall.com")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],       # Allow everything for now
+    allow_headers=["*"],       # In production you can restrict if needed
+)
+
+# =========================================================
+# ✅ ROOT ROUTE
+# =========================================================
+@app.get("/", response_class=JSONResponse)
+async def root():
+    return {"status": "ok", "message": "OmniSuite API is operational 👋"}
+
+# =========================================================
+# ✅ STATUS / HEALTH CHECK ENDPOINT
+# =========================================================
+@app.get("/health", response_class=JSONResponse)
+async def health_check():
+    return {"status": "healthy", "api": "FastAPI running on Render", "message": "OK"}
+
+# =========================================================
+# ✅ INCLUDE SUBMODULES / ROUTERS
+# =========================================================
 app.mount("/alpha", alpha_finance_app)
 
-# ------------------------------------------------------------
-# Root endpoint
-# ------------------------------------------------------------
-@app.get("/")
-def root():
-    return {"service": "OmniSuite Backend", "status": "online"}
+# =========================================================
+# ✅ APPLICATION RUN (for local testing only)
+# =========================================================
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "backend.main:app",
+        host="0.0.0.0",
+        port=10000,    # Port dynamically assigned on Render at runtime
+        reload=True
+    )
