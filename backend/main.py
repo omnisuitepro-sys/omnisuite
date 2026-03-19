@@ -40,6 +40,14 @@ app.add_middleware(
 async def root():
     return {"status": "ok", "message": "OmniSuite API is operational 👋"}
 
+@app.get("/listings")
+def get_listings():
+    return [
+        {"id": 1, "title": "iPhone Case", "price": 12.99},
+        {"id": 2, "title": "Wireless Mouse", "price": 24.99},
+        {"id": 3, "title": "LED Desk Lamp", "price": 34.99},
+    ]
+
 # =========================================================
 # ✅ STATUS / HEALTH CHECK ENDPOINT
 # =========================================================
