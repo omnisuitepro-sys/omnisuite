@@ -48,6 +48,17 @@ def get_listings():
         {"id": 3, "title": "LED Desk Lamp", "price": 34.99},
     ]
 
+from fastapi import Body
+
+# ------------------------------------------------------------
+# Create listing endpoint
+# ------------------------------------------------------------
+@app.post("/listings")
+def create_listing(data: dict = Body(...)):
+    return {
+        "status": "created",
+        "item": data
+    }
 # =========================================================
 # ✅ STATUS / HEALTH CHECK ENDPOINT
 # =========================================================
