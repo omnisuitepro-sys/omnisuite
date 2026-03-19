@@ -1,84 +1,89 @@
-from fastapi import FastAPI
+# ------------------------------------------------------------
+# main.py — OmniSuite Backend Entry Point
+# ------------------------------------------------------------
+
+import os
+from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from backend.finance.omni_alpha_routes import app as alpha_finance_app
+import psycopg2
 
-# =========================================================
-# ✅ FASTAPI APPLICATION INIT
-# =========================================================
-app = FastAPI(
-    title="OmniSuite API",
-    description="Core backend API for OmniMirror + OmniSuite dashboard.",
-    version="1.0.0",
-)
-
-# =========================================================
-# ✅ CORS CONFIGURATION (Updated)
-# =========================================================
-origins = [
-    "http://localhost:3000",                  # Local development dashboard
-    "https://dashboard.getomnirecall.com",    # Production dashboard
-    "https://api.getomnirecall.com",          # Render/Backend API
-]
-
-# Optional: wildcard subdomain support for future staging (e.g. beta, dev)
-# from starlette.middleware.cors import CORSMiddleware
-# origins.append("https://*.getomnirecall.com")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],       # Allow everything for now
-    allow_headers=["*"],       # In production you can restrict if needed
-)
-
-# =========================================================
-# ✅ ROOT ROUTE
-# =========================================================
-@app.get("/", response_class=JSONResponse)
-async def root():
-    return {"status": "ok", "message": "OmniSuite API is operational 👋"}
-
-@app.get("/listings")
-def get_listings():
-    return [
-        {"id": 1, "title": "iPhone Case", "price": 12.99},
-        {"id": 2, "title": "Wireless Mouse", "price": 24.99},
-        {"id": 3, "title": "LED Desk Lamp", "price": 34.99},
-    ]
-
-from fastapi import Body
+print("🚀 CURRENT DB_URL =", os.getenv("DB_URL"))
 
 # ------------------------------------------------------------
-# Create listing endpoint
+# Initialize FastAPI
+# ------------------------------------------------------------
+app = FastAPI(title="OmniSuite Backend", version="1.0.0")
+
+# ------------------------------------------------------------
+# CORS (allow frontend access)
+# ------------------------------------------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ------------------------------------------------------------
+# Database connection helper
+# ------------------------------------------------------------
+DB_URL = os.getenv("DB_URL")
+
+def get_db():
+    return psycopg2.connect(DB_URL)
+
+# ------------------------------------------------------------
+# Mount Finance Module (/alpha)
+# ------------------------------------------------------------
+from backend.finance.omni_alpha_routes import app as alpha_finance_app
+app.mount("/alpha", alpha_finance_app)
+
+# ------------------------------------------------------------
+# Root endpoint
+# ------------------------------------------------------------
+@app.get("/")
+def root():
+    return {"service": "OmniSuite Backend", "status": "online"}
+
+
+# ------------------------------------------------------------
+# GET Listings (from database)
+# ------------------------------------------------------------
+@app.get("/listings")
+def get_listings():
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT id, title, price FROM listings ORDER BY id DESC;")
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return [
+        {"id": r[0], "title": r[1], "price": float(r[2])}
+        for r in rows
+    ]
+
+
+# ------------------------------------------------------------
+# CREATE Listing (save to database)
 # ------------------------------------------------------------
 @app.post("/listings")
 def create_listing(data: dict = Body(...)):
-    return {
-        "status": "created",
-        "item": data
-    }
-# =========================================================
-# ✅ STATUS / HEALTH CHECK ENDPOINT
-# =========================================================
-@app.get("/health", response_class=JSONResponse)
-async def health_check():
-    return {"status": "healthy", "api": "FastAPI running on Render", "message": "OK"}
+    conn = get_db()
+    cur = conn.cursor()
 
-# =========================================================
-# ✅ INCLUDE SUBMODULES / ROUTERS
-# =========================================================
-app.mount("/alpha", alpha_finance_app)
-
-# =========================================================
-# ✅ APPLICATION RUN (for local testing only)
-# =========================================================
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        "backend.main:app",
-        host="0.0.0.0",
-        port=10000,    # Port dynamically assigned on Render at runtime
-        reload=True
+    cur.execute(
+        "INSERT INTO listings (title, price) VALUES (%s, %s) RETURNING id;",
+        (data["title"], data["price"]),
     )
+
+    new_id = cur.fetchone()[0]
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return {"id": new_id, "status": "created"}
