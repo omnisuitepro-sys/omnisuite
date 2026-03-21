@@ -39,10 +39,7 @@ export default function CreateListingPage() {
           onChange={(e) => setPrice(e.target.value)}
         />
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-6 py-3 rounded"
-        >
+        <button className="bg-blue-600 text-white px-6 py-3 rounded">
           Create
         </button>
       </form>

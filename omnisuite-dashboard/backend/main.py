@@ -87,3 +87,39 @@ def create_listing(data: dict = Body(...)):
     conn.close()
 
     return {"id": new_id, "status": "created"}
+
+# ------------------------------------------------------------
+# UPDATE Listing
+# ------------------------------------------------------------
+@app.put("/listings/{id}")
+def update_listing(id: int, data: dict):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute(
+        "UPDATE listings SET title=%s, price=%s WHERE id=%s;",
+        (data["title"], data["price"], id),
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"status": "updated"}
+
+
+# ------------------------------------------------------------
+# DELETE Listing
+# ------------------------------------------------------------
+@app.delete("/listings/{id}")
+def delete_listing(id: int):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM listings WHERE id=%s;", (id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"status": "deleted"}
