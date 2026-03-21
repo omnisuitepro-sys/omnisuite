@@ -4,6 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import api from "@/lib/api";
 
+const { data: metrics } = useQuery({
+  queryKey: ["metrics"],
+  queryFn: async () => (await api.get("/metrics")).data,
+});
+
 export default function ListingsPage() {
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [search, setSearch] = useState("");
@@ -28,6 +33,30 @@ export default function ListingsPage() {
   return (
     <main className="p-10">
       <h1 className="text-3xl font-bold mb-6">Listings</h1>
+
+{/* ✅ Metrics */}
+<div className="grid grid-cols-3 gap-4 mb-6">
+  <div className="bg-white p-4 rounded shadow">
+    <p className="text-gray-500">Total Listings</p>
+    <h2 className="text-2xl font-bold">
+      {metrics?.total_listings ?? 0}
+    </h2>
+  </div>
+
+  <div className="bg-white p-4 rounded shadow">
+    <p className="text-gray-500">Total Value</p>
+    <h2 className="text-2xl font-bold">
+      ${metrics?.total_value?.toFixed(2) ?? "0.00"}
+    </h2>
+  </div>
+
+  <div className="bg-white p-4 rounded shadow">
+    <p className="text-gray-500">Avg Price</p>
+    <h2 className="text-2xl font-bold">
+      ${metrics?.avg_price?.toFixed(2) ?? "0.00"}
+    </h2>
+  </div>
+</div>
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6 flex-wrap">
