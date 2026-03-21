@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://omnisuite-api.onrender.com", // ✅ TEMP FIX
+  baseURL: "https://omnisuite-api.onrender.com",
 });
 
 export default api;

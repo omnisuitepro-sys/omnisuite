@@ -27,7 +27,7 @@ export default function CreateListingPage() {
       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
         <input
           className="w-full p-3 border rounded"
-          placeholder="Product title"
+          placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
