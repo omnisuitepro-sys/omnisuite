@@ -1,23 +1,81 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import api from "@/lib/api";
 
 export default function ListingsPage() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["listings"],
-    queryFn: async () => (await api.get("/listings")).data,
+  const [activeTab, setActiveTab] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
+
+  const { data: tabs = [] } = useQuery({
+    queryKey: ["tabs"],
+    queryFn: async () => (await api.get("/tabs")).data,
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading listings</p>;
+  const { data: listings = [], refetch } = useQuery({
+    queryKey: ["listings", activeTab],
+    queryFn: async () => {
+      const url = activeTab ? `/listings?tab_id=${activeTab}` : "/listings";
+      return (await api.get(url)).data;
+    },
+  });
+
+  const filtered = listings.filter((item: any) =>
+    item.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <main className="p-10">
       <h1 className="text-3xl font-bold mb-6">Listings</h1>
 
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6 flex-wrap">
+        <button
+          onClick={() => setActiveTab(null)}
+          className={`px-4 py-2 rounded ${
+            activeTab === null ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          All
+        </button>
+
+        {tabs.map((tab: any) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2 rounded ${
+              activeTab === tab.id ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            {tab.name}
+          </button>
+        ))}
+
+        <button
+          onClick={async () => {
+            const name = prompt("New tab name");
+            if (!name) return;
+            await api.post("/tabs", { name });
+            location.reload();
+          }}
+          className="bg-green-600 text-white px-4 py-2 rounded"
+        >
+          + Tab
+        </button>
+      </div>
+
+      {/* Search */}
+      <input
+        placeholder="Search..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="p-3 border rounded mb-6 w-full max-w-sm"
+      />
+
+      {/* Listings */}
       <div className="space-y-4">
-        {data.map((item: any) => (
+        {filtered.map((item: any) => (
           <div key={item.id} className="p-4 bg-white rounded shadow flex justify-between">
             <div>
               <h2 className="font-bold">{item.title}</h2>
