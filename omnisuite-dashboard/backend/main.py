@@ -40,7 +40,7 @@ def root():
     return {"status": "ok"}
 
 # ------------------------------------------------------------
-# METRICS
+# ✅ METRICS (THIS WAS MISSING BEFORE)
 # ------------------------------------------------------------
 @app.get("/metrics")
 def get_metrics():
@@ -48,7 +48,9 @@ def get_metrics():
     cur = conn.cursor()
 
     try:
-        cur.execute("SELECT COUNT(*), COALESCE(SUM(price), 0), COALESCE(AVG(price), 0) FROM listings;")
+        cur.execute(
+            "SELECT COUNT(*), COALESCE(SUM(price),0), COALESCE(AVG(price),0) FROM listings;"
+        )
         result = cur.fetchone()
 
         return {
