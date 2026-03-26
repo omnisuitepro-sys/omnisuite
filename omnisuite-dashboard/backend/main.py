@@ -1,17 +1,10 @@
-# ------------------------------------------------------------
-# OmniSuite Backend (FULL FINAL VERSION)
-# ------------------------------------------------------------
-
 import os
 import psycopg2
 from fastapi import FastAPI, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="OmniSuite Backend", version="1.0.0")
+app = FastAPI()
 
-# ------------------------------------------------------------
-# CORS
-# ------------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,56 +13,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ------------------------------------------------------------
-# DB CONNECTION (Neon)
-# ------------------------------------------------------------
 DB_URL = os.getenv("DB_URL")
 
 def get_db():
-    try:
-        return psycopg2.connect(DB_URL)
-    except Exception as e:
-        print("DB ERROR:", e)
-        raise HTTPException(status_code=500, detail="DB connection failed")
+    return psycopg2.connect(DB_URL)
 
-# ------------------------------------------------------------
-# ROOT
-# ------------------------------------------------------------
-@app.get("/")
-def root():
-    return {"status": "ok"}
-
-# ------------------------------------------------------------
-# ✅ METRICS (THIS WAS MISSING BEFORE)
-# ------------------------------------------------------------
+# ---------------- METRICS ----------------
 @app.get("/metrics")
-def get_metrics():
+def metrics():
     conn = get_db()
     cur = conn.cursor()
 
-    try:
-        cur.execute(
-            "SELECT COUNT(*), COALESCE(SUM(price),0), COALESCE(AVG(price),0) FROM listings;"
-        )
-        result = cur.fetchone()
+    cur.execute("""
+        SELECT 
+        COUNT(*),
+        COALESCE(SUM(price),0),
+        COALESCE(AVG(price),0),
+        COALESCE(SUM(price - cost),0)
+        FROM listings;
+    """)
 
-        return {
-            "total_listings": result[0],
-            "total_value": float(result[1]),
-            "avg_price": float(result[2])
-        }
+    r = cur.fetchone()
 
-    except Exception as e:
-        print("METRICS ERROR:", e)
-        raise HTTPException(status_code=500, detail="Failed to fetch metrics")
+    cur.close()
+    conn.close()
 
-    finally:
-        cur.close()
-        conn.close()
+    return {
+        "total_listings": r[0],
+        "total_value": float(r[1]),
+        "avg_price": float(r[2]),
+        "total_profit": float(r[3])
+    }
 
-# ------------------------------------------------------------
-# TABS
-# ------------------------------------------------------------
+# ---------------- TABS ----------------
 @app.get("/tabs")
 def get_tabs():
     conn = get_db()
@@ -85,7 +61,7 @@ def get_tabs():
 
 
 @app.post("/tabs")
-def create_tab(data: dict = Body(...)):
+def create_tab(data: dict):
     conn = get_db()
     cur = conn.cursor()
 
@@ -94,17 +70,16 @@ def create_tab(data: dict = Body(...)):
         (data["name"],)
     )
 
-    tab_id = cur.fetchone()[0]
+    tid = cur.fetchone()[0]
     conn.commit()
 
     cur.close()
     conn.close()
 
-    return {"id": tab_id, "name": data["name"]}
+    return {"id": tid, "name": data["name"]}
 
-# ------------------------------------------------------------
-# LISTINGS
-# ------------------------------------------------------------
+
+# ---------------- LISTINGS ----------------
 @app.get("/listings")
 def get_listings(tab_id: int = None):
     conn = get_db()
@@ -112,12 +87,12 @@ def get_listings(tab_id: int = None):
 
     if tab_id:
         cur.execute(
-            "SELECT id, title, price FROM listings WHERE tab_id=%s ORDER BY id DESC;",
+            "SELECT id,title,price FROM listings WHERE tab_id=%s ORDER BY id DESC;",
             (tab_id,)
         )
     else:
         cur.execute(
-            "SELECT id, title, price FROM listings ORDER BY id DESC;"
+            "SELECT id,title,price FROM listings ORDER BY id DESC;"
         )
 
     rows = cur.fetchall()
@@ -132,7 +107,7 @@ def get_listings(tab_id: int = None):
 
 
 @app.post("/listings")
-def create_listing(data: dict = Body(...)):
+def create_listing(data: dict):
     conn = get_db()
     cur = conn.cursor()
 
@@ -141,23 +116,66 @@ def create_listing(data: dict = Body(...)):
         (data["title"], data["price"], data.get("tab_id"))
     )
 
-    new_id = cur.fetchone()[0]
+    nid = cur.fetchone()[0]
     conn.commit()
 
     cur.close()
     conn.close()
 
-    return {"id": new_id}
+    return {"id": nid}
+# ---------------- LISTINGS ----------------
+@app.get("/listings")
+def listings(tab_id: int = None):
+    conn = get_db()
+    cur = conn.cursor()
 
+    if tab_id:
+        cur.execute("SELECT id,title,price,cost FROM listings WHERE tab_id=%s ORDER BY id DESC;", (tab_id,))
+    else:
+        cur.execute("SELECT id,title,price,cost FROM listings ORDER BY id DESC;")
 
-@app.put("/listings/{id}")
-def update_listing(id: int, data: dict = Body(...)):
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return [
+        {
+            "id": r[0],
+            "title": r[1],
+            "price": float(r[2]),
+            "cost": float(r[3]),
+            "profit": float(r[2] - r[3])
+        }
+        for r in rows
+    ]
+
+@app.post("/listings")
+def create_listing(data: dict):
     conn = get_db()
     cur = conn.cursor()
 
     cur.execute(
-        "UPDATE listings SET title=%s, price=%s WHERE id=%s;",
-        (data["title"], data["price"], id),
+        "INSERT INTO listings (title,price,cost,tab_id) VALUES (%s,%s,%s,%s) RETURNING id;",
+        (data["title"], data["price"], data["cost"], data.get("tab_id"))
+    )
+
+    nid = cur.fetchone()[0]
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return {"id": nid}
+
+@app.put("/listings/{id}")
+def update_listing(id: int, data: dict):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute(
+        "UPDATE listings SET title=%s, price=%s, cost=%s WHERE id=%s;",
+        (data["title"], data["price"], data["cost"], id)
     )
 
     conn.commit()
@@ -165,7 +183,6 @@ def update_listing(id: int, data: dict = Body(...)):
     conn.close()
 
     return {"status": "updated"}
-
 
 @app.delete("/listings/{id}")
 def delete_listing(id: int):

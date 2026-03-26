@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const api = axios.create({
+export default axios.create({
   baseURL: "https://omnisuite-api.onrender.com",
 });
-
-export default api;
