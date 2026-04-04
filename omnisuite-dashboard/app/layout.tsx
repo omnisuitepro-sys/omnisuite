@@ -10,6 +10,7 @@ export default function Layout({ children }: any) {
           <Link href="/">Dashboard</Link><br/>
           <Link href="/listings">Listings</Link><br/>
           <Link href="/listings/create">Create</Link>
+	<Link href="/scan">AI Scanner</Link>
         </aside>
 
         <main className="flex-1 p-6">

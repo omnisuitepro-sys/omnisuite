@@ -1,9 +1,64 @@
 import os
+import base64
+import requests
 import psycopg2
-import threading
-import time
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+
+def get_ebay_token():
+    import base64
+
+    client_id = os.getenv("EBAY_CLIENT_ID")
+    client_secret = os.getenv("EBAY_CLIENT_SECRET")
+
+    auth = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+
+    headers = {
+        "Authorization": f"Basic {auth}",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    data = {
+        "grant_type": "client_credentials",
+        "scope": "https://api.ebay.com/oauth/api_scope"
+    }
+
+    r = requests.post("https://api.ebay.com/identity/v1/oauth2/token", headers=headers, data=data)
+    return r.json()["access_token"]
+
+def ebay_sold_search(query):
+    token = get_ebay_token()
+
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+
+    url = f"https://api.ebay.com/buy/browse/v1/item_summary/search?q={query}&filter=soldItems:true&limit=5"
+
+    r = requests.get(url, headers=headers)
+    data = r.json()
+
+    sold = []
+
+    for item in data.get("itemSummaries", []):
+        try:
+            sold.append({
+                "price": float(item["price"]["value"]),
+                "title": item["title"]
+            })
+        except:
+            continue
+
+    return sold
+
+def calculate_market_price(sold):
+    if not sold:
+        return None
+
+    prices = [s["price"] for s in sold]
+    avg = sum(prices) / len(prices)
+
+    return round(avg, 2)
 
 app = FastAPI()
 
@@ -15,164 +70,145 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB_URL = os.getenv("DB_URL")
-
+# ---------------- DATABASE ----------------
 def db():
-    return psycopg2.connect(DB_URL)
+    return psycopg2.connect(os.getenv("DB_URL"))
 
 # ---------------- ROOT ----------------
 @app.get("/")
 def root():
-    return {"status": "ok"}
+    return {"status": "OmniSuite Running"}
 
-# ---------------- TABS ----------------
-@app.get("/tabs")
-def tabs():
-    conn=db();cur=conn.cursor()
-    cur.execute("SELECT id,name FROM tabs ORDER BY id")
-    rows=cur.fetchall()
-    cur.close();conn.close()
-    return [{"id":r[0],"name":r[1]} for r in rows]
+# ---------------- CLOUDINARY UPLOAD ----------------
+def upload_to_cloudinary(image_bytes):
+    url = f"https://api.cloudinary.com/v1_1/{os.getenv('CLOUDINARY_CLOUD_NAME')}/image/upload"
 
-@app.post("/tabs")
-def create_tab(data:dict=Body(...)):
-    conn=db();cur=conn.cursor()
-    cur.execute("INSERT INTO tabs(name) VALUES(%s) RETURNING id;",(data["name"],))
-    tid=cur.fetchone()[0]
-    conn.commit()
-    cur.close();conn.close()
-    return {"id":tid}
+    files = {"file": image_bytes}
+    data = {"upload_preset": "ml_default"}
 
-# ---------------- LISTINGS ----------------
-@app.get("/listings")
-def listings(tab_id:int=None):
-    conn=db();cur=conn.cursor()
+    r = requests.post(url, files=files, data=data)
+    return r.json()["secure_url"]
 
-    if tab_id:
-        cur.execute("SELECT id,title,price,cost FROM listings WHERE tab_id=%s",(tab_id,))
-    else:
-        cur.execute("SELECT id,title,price,cost FROM listings")
+# ---------------- OPENAI VISION ----------------
+def ai_vision(image_bytes):
+    url = "https://api.openai.com/v1/responses"
 
-    rows=cur.fetchall()
-    cur.close();conn.close()
-
-    return [{
-        "id":r[0],
-        "title":r[1],
-        "price":float(r[2]),
-        "cost":float(r[3]),
-        "profit":float(r[2]-r[3])
-    } for r in rows]
-
-@app.post("/listings")
-def create_listing(data:dict=Body(...)):
-    conn=db();cur=conn.cursor()
-    cur.execute(
-        "INSERT INTO listings(title,price,cost,tab_id) VALUES(%s,%s,%s,%s) RETURNING id;",
-        (data["title"],data["price"],data.get("cost",0),data.get("tab_id"))
-    )
-    nid=cur.fetchone()[0]
-    conn.commit()
-    cur.close();conn.close()
-    return {"id":nid}
-
-@app.delete("/listings/{id}")
-def delete_listing(id:int):
-    conn=db();cur=conn.cursor()
-    cur.execute("DELETE FROM listings WHERE id=%s",(id,))
-    conn.commit()
-    cur.close();conn.close()
-    return {"status":"deleted"}
-
-# ---------------- METRICS ----------------
-@app.get("/metrics")
-def metrics():
-    conn=db();cur=conn.cursor()
-    cur.execute("""
-        SELECT COUNT(*),
-        COALESCE(SUM(price),0),
-        COALESCE(AVG(price),0),
-        COALESCE(SUM(price-cost),0)
-        FROM listings
-    """)
-    r=cur.fetchone()
-    cur.close();conn.close()
-    return {
-        "total_listings":r[0],
-        "total_value":float(r[1]),
-        "avg_price":float(r[2]),
-        "total_profit":float(r[3])
+    headers = {
+        "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
+        "Content-Type": "application/json"
     }
 
-# ---------------- SMART AUTOMATION ----------------
-def run_smart():
-    conn=db();cur=conn.cursor()
+    image_base64 = base64.b64encode(image_bytes).decode()
 
-    cur.execute("SELECT COALESCE(AVG(price-cost),0) FROM listings")
-    avg_profit=cur.fetchone()[0]
+    data = {
+        "model": "gpt-4.1-mini",
+        "input": [{
+            "role": "user",
+            "content": [
+                {"type": "input_text", "text": "Identify this product exactly (sports card: year, brand, player, number)."},
+                {"type": "input_image", "image_base64": image_base64}
+            ]
+        }]
+    }
 
-    cur.execute("SELECT id,price,cost FROM listings")
-    rows=cur.fetchall()
+    r = requests.post(url, headers=headers, json=data)
+    return r.json()["output"][0]["content"][0]["text"]
 
-    for r in rows:
-        pid=r[0];price=float(r[1]);cost=float(r[2])
-        profit=price-cost
+# ---------------- ALIEXPRESS SEARCH ----------------
+def aliexpress_search(image_url):
+    url = "https://aliexpress-datahub.p.rapidapi.com/item_search_image"
 
-        if profit<avg_profit*0.5:
-            cur.execute("DELETE FROM listings WHERE id=%s",(pid,))
+    headers = {
+        "x-rapidapi-key": os.getenv("RAPID_API_KEY_ALIEXPRESS"),
+        "x-rapidapi-host": "aliexpress-datahub.p.rapidapi.com"
+    }
 
-        elif profit<avg_profit:
-            new_price=round(price*1.08,2)
-            cur.execute("UPDATE listings SET price=%s WHERE id=%s",(new_price,pid))
+    params = {
+        "sort": "default",
+        "catId": "0",
+        "imgUrl": image_url
+    }
 
-        elif profit>avg_profit*1.5:
-            new_price=round(price*1.05,2)
-            cur.execute("UPDATE listings SET price=%s WHERE id=%s",(new_price,pid))
+    r = requests.get(url, headers=headers, params=params)
+    data = r.json()
 
-    conn.commit()
-    cur.close();conn.close()
+    results = []
 
-@app.post("/automation/run")
-def automation():
-    run_smart()
-    return {"status":"done"}
-
-# ---------------- ARBITRAGE ----------------
-def find_products():
-    return [
-        {"title":"Speaker","cost":12,"price":25},
-        {"title":"Phone Stand","cost":3,"price":12},
-        {"title":"LED Lights","cost":8,"price":22},
-    ]
-
-@app.post("/arbitrage/run")
-def arbitrage():
-    conn=db();cur=conn.cursor()
-    products=find_products()
-
-    for p in products:
-        if p["price"]-p["cost"]>8:
-            cur.execute(
-                "INSERT INTO listings(title,price,cost) VALUES(%s,%s,%s)",
-                (p["title"],p["price"],p["cost"])
-            )
-
-    conn.commit()
-    cur.close();conn.close()
-
-    return {"added":len(products)}
-
-# ---------------- AUTO LOOP ----------------
-def loop():
-    while True:
+    for item in data.get("data", [])[:5]:
         try:
-            run_smart()
-        except Exception as e:
-            print(e)
-        time.sleep(60)
+            results.append({
+                "title": item.get("title"),
+                "price": float(item.get("price", 0)),
+                "image": item.get("image"),
+                "url": item.get("itemUrl")
+            })
+        except:
+            continue
 
-@app.on_event("startup")
-def start():
-    t=threading.Thread(target=loop)
-    t.daemon=True
-    t.start()
+    return results
+
+# ---------------- PROFIT ENGINE ----------------
+def calculate_profit(suppliers):
+    if not suppliers:
+        return None
+
+    best = min(suppliers, key=lambda x: x["price"])
+
+    return {
+        "best_cost": best["price"],
+        "recommended_price": round(best["price"] * 2.2, 2),
+        "profit": round(best["price"] * 1.2, 2),
+        "supplier": best
+    }
+
+# ---------------- MAIN AI PIPELINE ----------------
+@app.post("/ai/scan")
+async def scan(file: UploadFile = File(...)):
+    image_bytes = await file.read()
+
+    # 1. Upload image
+    image_url = upload_to_cloudinary(image_bytes)
+
+    # 2. AI identify
+    product_name = ai_vision(image_bytes)
+
+    # 3. Supplier (cost)
+    suppliers = aliexpress_search(image_url)
+
+    # 4. eBay sold comps
+    sold = ebay_sold_search(product_name)
+
+    # 5. Market price
+    market_price = calculate_market_price(sold)
+
+    # 6. Best supplier
+    best_cost = min([s["price"] for s in suppliers]) if suppliers else 0
+
+    profit = market_price - best_cost if market_price else 0
+
+    return {
+        "product_name": product_name,
+        "image_url": image_url,
+        "suppliers": suppliers,
+        "sold_comps": sold,
+        "market_price": market_price,
+        "best_cost": best_cost,
+        "profit": profit
+    }
+@app.post("/listings/auto-create")
+def auto_create(data: dict):
+    conn = db()
+    cur = conn.cursor()
+
+    cur.execute(
+        "INSERT INTO listings(title, price, cost) VALUES (%s,%s,%s) RETURNING id;",
+        (data["title"], data["price"], data["cost"])
+    )
+
+    new_id = cur.fetchone()[0]
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"id": new_id}
